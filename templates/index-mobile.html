@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pokémon TCG Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <!-- Tela de Conexão -->
+    <div id="connection-screen" class="connection-screen">
+        <div class="connection-content">
+            <div class="logo">
+                <h1>🎴 Pokémon TCG</h1>
+                <p>Battle Tracker</p>
+            </div>
+            
+            <div class="connection-options">
+                <div class="option-card">
+                    <div class="option-icon">🎮</div>
+                    <h3>Criar Partida</h3>
+                    <input type="text" id="player-name-create" placeholder="Seu nome" maxlength="20">
+                    <button onclick="createNewGame()" class="btn-primary">Criar Jogo</button>
+                </div>
+                
+                <div class="option-card">
+                    <div class="option-icon">🔗</div>
+                    <h3>Entrar na Partida</h3>
+                    <input type="text" id="player-name-join" placeholder="Seu nome" maxlength="20">
+                    <input type="text" id="room-code" placeholder="Código da Sala" maxlength="8">
+                    <button onclick="joinExistingGame()" class="btn-secondary">Entrar</button>
+                </div>
+            </div>
+            
+            <div class="connection-status">
+                <div class="status-indicator">🔴 Desconectado</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela do Jogo -->
+    <div id="game-screen" class="game-screen" style="display: none;">
+        <!-- Header Mobile -->
+        <header class="mobile-header">
+            <div class="header-top">
+                <div class="room-info">
+                    <span class="room-label">Sala:</span>
+                    <span class="room-code" id="room-display"></span>
+                    <button onclick="copyRoomCode()" class="copy-btn">📋</button>
+                </div>
+                <button onclick="resetGame()" class="reset-btn">🔄</button>
+            </div>
+            <div class="player-role" id="player-role"></div>
+        </header>
+
+        <!-- Área do Jogo -->
+        <div class="game-container">
+            <!-- Oponente (Topo) -->
+            <div class="player-zone opponent">
+                <div class="player-header">
+                    <h3 id="player2-name">Jogador 2</h3>
+                    <div class="player-stats">
+                        <span id="player2-status" class="status-dot">🔴</span>
+                        <div class="prize-counter">
+                            <span>🏆</span>
+                            <input type="number" id="player2-prizes" min="0" max="6" value="6" 
+                                   onchange="updatePrizeCards('player2', this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pokémon Ativo do Oponente -->
+                <div class="active-section">
+                    <div class="active-pokemon" data-player="player2" data-position="active">
+                        <div class="pokemon-card active-card" id="player2-active"></div>
+                    </div>
+                </div>
+
+                <!-- Banco do Oponente -->
+                <div class="bench-section">
+                    <div class="bench-grid">
+                        <div class="bench-slot" data-player="player2" data-position="0">
+                            <div class="pokemon-card" id="player2-bench-0"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player2', 0)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player2" data-position="1">
+                            <div class="pokemon-card" id="player2-bench-1"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player2', 1)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player2" data-position="2">
+                            <div class="pokemon-card" id="player2-bench-2"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player2', 2)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player2" data-position="3">
+                            <div class="pokemon-card" id="player2-bench-3"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player2', 3)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player2" data-position="4">
+                            <div class="pokemon-card" id="player2-bench-4"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player2', 4)" style="display: none;">↕️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divisor Central -->
+            <div class="game-divider">
+                <div class="vs-indicator">VS</div>
+            </div>
+
+            <!-- Jogador (Baixo) -->
+            <div class="player-zone player">
+                <!-- Banco do Jogador -->
+                <div class="bench-section">
+                    <div class="bench-grid">
+                        <div class="bench-slot" data-player="player1" data-position="0">
+                            <div class="pokemon-card" id="player1-bench-0"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player1', 0)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player1" data-position="1">
+                            <div class="pokemon-card" id="player1-bench-1"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player1', 1)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player1" data-position="2">
+                            <div class="pokemon-card" id="player1-bench-2"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player1', 2)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player1" data-position="3">
+                            <div class="pokemon-card" id="player1-bench-3"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player1', 3)" style="display: none;">↕️</button>
+                        </div>
+                        <div class="bench-slot" data-player="player1" data-position="4">
+                            <div class="pokemon-card" id="player1-bench-4"></div>
+                            <button class="swap-btn" onclick="swapWithActive('player1', 4)" style="display: none;">↕️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pokémon Ativo do Jogador -->
+                <div class="active-section">
+                    <div class="active-pokemon" data-player="player1" data-position="active">
+                        <div class="pokemon-card active-card" id="player1-active"></div>
+                    </div>
+                </div>
+
+                <div class="player-header">
+                    <h3 id="player1-name">Jogador 1</h3>
+                    <div class="player-stats">
+                        <span id="player1-status" class="status-dot">🔴</span>
+                        <div class="prize-counter">
+                            <span>🏆</span>
+                            <input type="number" id="player1-prizes" min="0" max="6" value="6" 
+                                   onchange="updatePrizeCards('player1', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles Flutuantes -->
+        <div id="controls-panel" class="controls-panel" style="display: none;">
+            <div class="controls-header">
+                <h4 id="controls-title">Controles do Pokémon</h4>
+                <button onclick="closeControls()" class="close-controls">✕</button>
+            </div>
+            
+            <div class="controls-content">
+                <!-- Status Effects -->
+                <div class="control-group">
+                    <label>Status:</label>
+                    <select id="active-status-select" onchange="updateActiveStatus(this.value)">
+                        <option value="">Nenhum</option>
+                        <option value="Envenenado">🟣 Envenenado</option>
+                        <option value="Paralisado">⚡ Paralisado</option>
+                        <option value="Adormecido">😴 Adormecido</option>
+                        <option value="Queimado">🔥 Queimado</option>
+                        <option value="Confuso">🌀 Confuso</option>
+                    </select>
+                </div>
+
+                <!-- Damage Counters -->
+                <div class="control-group">
+                    <label>Contadores de Dano:</label>
+                    <div class="counter-input-group">
+                        <input type="number" id="active-damage-counters" min="0" 
+                               onchange="updateActiveDamageCounters(this.value)">
+                        <span class="counter-icon">💥</span>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="action-row">
+                        <input type="number" id="damage-input" placeholder="Dano" min="0" class="action-input">
+                        <button onclick="applyQuickDamage()" class="action-btn damage-btn">💥</button>
+                    </div>
+                    <div class="action-row">
+                        <input type="number" id="heal-input" placeholder="Cura" min="0" class="action-input">
+                        <button onclick="applyQuickHeal()" class="action-btn heal-btn">💚</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar Pokémon -->
+    <div id="pokemon-modal" class="modal">
+        <div class="modal-content mobile-modal">
+            <div class="modal-header">
+                <h3>Editar Pokémon</h3>
+                <button onclick="closeModal()" class="modal-close">✕</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>HP Máximo:</label>
+                    <input type="number" id="pokemon-max-hp" min="0" placeholder="HP Máximo">
+                </div>
+                
+                <div class="form-group">
+                    <label>HP Atual:</label>
+                    <input type="number" id="pokemon-current-hp" min="0" placeholder="HP Atual">
+                </div>
+                
+                <div class="form-group">
+                    <label>Contadores de Dano:</label>
+                    <input type="number" id="pokemon-damage-counters" min="0" placeholder="Contadores">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button onclick="savePokemon()" class="btn-primary">💾 Salvar</button>
+                <button onclick="closeModal()" class="btn-secondary">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Knockout -->
+    <div id="knockout-modal" class="modal">
+        <div class="modal-content knockout-modal mobile-modal">
+            <div class="modal-header knockout-header">
+                <h3>💀 KNOCKOUT!</h3>
+            </div>
+            <div class="modal-body">
+                <div id="knockout-message"></div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeKnockoutModal()" class="btn-primary">✅ OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Vitória -->
+    <div id="victory-modal" class="modal">
+        <div class="modal-content victory-modal mobile-modal">
+            <div class="modal-header victory-header">
+                <h3>🏆 VITÓRIA!</h3>
+            </div>
+            <div class="modal-body">
+                <div id="victory-message"></div>
+                <div class="victory-celebration">
+                    <div class="fireworks">🎆</div>
+                    <div class="trophy">🏆</div>
+                    <div class="fireworks">🎇</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeVictoryModal()" class="btn-primary">🎊 Celebrar</button>
+                <button onclick="resetGame(); closeVictoryModal();" class="btn-secondary">🔄 Novo Jogo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element -->
+    <audio id="victory-audio" preload="none"></audio>
+
+    <script>
+        // Variáveis globais
+        let socket;
+        let currentPlayer = '';
+        let currentPosition = '';
+        let gameState = {};
+        let roomId = '';
+        let myPlayer = '';
+        let myPlayerName = '';
+        let currentControlsPlayer = '';
+        let currentControlsPosition = '';
+
+        // Inicializar conexão
+        function initializeConnection() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                updateConnectionStatus(true);
+            });
+            
+            socket.on('disconnect', () => {
+                updateConnectionStatus(false);
+            });
+            
+            socket.on('player_assigned', (data) => {
+                myPlayer = data.player;
+                roomId = data.room_id;
+                gameState = data.game_state;
+                
+                document.getElementById('room-display').textContent = roomId;
+                document.getElementById('player-role').textContent = `Você é: ${myPlayerName}`;
+                
+                showGameScreen();
+                updateUI();
+            });
+            
+            socket.on('game_state_update', (data) => {
+                gameState = data;
+                updateUI();
+            });
+            
+            socket.on('knockouts_occurred', (data) => {
+                showKnockoutModal(data.knockouts);
+            });
+            
+            socket.on('game_ended', (data) => {
+                showVictoryModal(data.winner);
+            });
+            
+            socket.on('victory_sound', (data) => {
+                if (data.sound_url) {
+                    playVictoryAudio(data.sound_url);
+                }
+            });
+        }
+
+        // Funções de conexão
+        function createNewGame() {
+            const playerName = document.getElementById('player-name-create').value.trim();
+            if (!playerName) {
+                showNotification('Por favor, digite seu nome!', 'error');
+                return;
+            }
+            
+            myPlayerName = playerName;
+            socket.emit('join_game', { player_name: playerName });
+        }
+
+        function joinExistingGame() {
+            const playerName = document.getElementById('player-name-join').value.trim();
+            const code = document.getElementById('room-code').value.trim();
+            
+            if (!playerName) {
+                showNotification('Por favor, digite seu nome!', 'error');
+                return;
+            }
+            
+            if (!code) {
+                showNotification('Por favor, digite o código da sala!', 'error');
+                return;
+            }
+            
+            myPlayerName = playerName;
+            socket.emit('join_game', { room_id: code, player_name: playerName });
+        }
+
+        function updateConnectionStatus(connected) {
+            const indicator = document.querySelector('.status-indicator');
+            if (connected) {
+                indicator.textContent = '🟢 Conectado';
+                indicator.style.color = '#28a745';
+            } else {
+                indicator.textContent = '🔴 Desconectado';
+                indicator.style.color = '#dc3545';
+            }
+        }
+
+        function showGameScreen() {
+            document.getElementById('connection-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+        }
+
+        function copyRoomCode() {
+            navigator.clipboard.writeText(roomId).then(() => {
+                showNotification('Código copiado!', 'success');
+            });
+        }
+
+        // Controles móveis
+        function showControls(player, position) {
+            if (!canControl(player)) return;
+            
+            currentControlsPlayer = player;
+            currentControlsPosition = position;
+            
+            let pokemon;
+            if (position === 'active') {
+                pokemon = gameState[player].active;
+            } else {
+                pokemon = gameState[player].bench[parseInt(position)];
+            }
+            
+            // Atualizar título
+            const positionName = position === 'active' ? 'Ativo' : `Banco ${parseInt(position) + 1}`;
+            document.getElementById('controls-title').textContent = `${pokemon.name || 'Pokémon'} - ${positionName}`;
+            
+            // Atualizar controles
+            document.getElementById('active-status-select').value = pokemon.status_effects[0] || '';
+            document.getElementById('active-damage-counters').value = pokemon.damage_counters || 0;
+            
+            // Mostrar painel
+            document.getElementById('controls-panel').style.display = 'block';
+        }
+
+        function closeControls() {
+            document.getElementById('controls-panel').style.display = 'none';
+        }
+
+        function updateActiveStatus(status) {
+            updateStatusFromSelect(currentControlsPlayer, currentControlsPosition, status);
+        }
+
+        function updateActiveDamageCounters(counters) {
+            updateDamageCounters(currentControlsPlayer, currentControlsPosition, counters);
+        }
+
+        function applyQuickDamage() {
+            const damage = parseInt(document.getElementById('damage-input').value) || 0;
+            if (damage <= 0) return;
+            
+            const attackingPlayer = currentControlsPlayer === 'player1' ? 'player2' : 'player1';
+            quickDamage(currentControlsPlayer, currentControlsPosition, attackingPlayer);
+            document.getElementById('damage-input').value = '';
+        }
+
+        function applyQuickHeal() {
+            const heal = parseInt(document.getElementById('heal-input').value) || 0;
+            if (heal <= 0) return;
+            
+            quickHeal(currentControlsPlayer, currentControlsPosition);
+            document.getElementById('heal-input').value = '';
+        }
+
+        // Atualizar interface
+        function updateUI() {
+            if (!gameState) return;
+            
+            // Atualizar nomes dos jogadores
+            if (gameState.player1.name) {
+                document.getElementById('player1-name').textContent = gameState.player1.name;
+            }
+            if (gameState.player2.name) {
+                document.getElementById('player2-name').textContent = gameState.player2.name;
+            }
+            
+            // Atualizar indicadores de conexão
+            document.getElementById('player1-status').textContent = gameState.player1.connected ? '��' : '🔴';
+            document.getElementById('player2-status').textContent = gameState.player2.connected ? '🟢' : '��';
+            
+            // Atualizar cartas prêmio
+            document.getElementById('player1-prizes').value = gameState.player1.prize_cards;
+            document.getElementById('player2-prizes').value = gameState.player2.prize_cards;
+            
+            // Atualizar Pokémon ativo
+            updatePokemonCard('player1-active', gameState.player1.active);
+            updatePokemonCard('player2-active', gameState.player2.active);
+            
+            // Atualizar banco
+            for (let i = 0; i < 5; i++) {
+                updatePokemonCard(`player1-bench-${i}`, gameState.player1.bench[i]);
+                updatePokemonCard(`player2-bench-${i}`, gameState.player2.bench[i]);
+            }
+            
+            // Atualizar botões de troca
+            updateSwapButtons();
+            
+            // Verificar se o jogo terminou
+            if (gameState.game_ended && gameState.winner) {
+                showVictoryModal(gameState.winner);
+            }
+        }
+
+        // Verificar se é minha vez de jogar
+        function canControl(player) {
+            return myPlayer === player;
+        }
+
+        // Funções do jogo (mantém as mesmas do código anterior)
+        function updatePokemon(player, position, pokemonData) {
+            if (!canControl(player)) return;
+            
+            socket.emit('update_pokemon', {
+                room_id: roomId,
+                player: player,
+                position: position,
+                pokemon: pokemonData
+            });
+        }
+
+        function quickDamage(player, position, attackingPlayer) {
+            const damageInput = document.getElementById(`${player}-damage`);
+            const damage = parseInt(damageInput ? damageInput.value : document.getElementById('damage-input').value) || 0;
+            if (damage <= 0) return;
+            
+            socket.emit('apply_damage', {
+                room_id: roomId,
+                player: player,
+                position: position,
+                damage: damage,
+                attacking_player: attackingPlayer
+            });
+            
+            if (damageInput) damageInput.value = '';
+        }
+
+        function quickHeal(player, position) {
+            if (!canControl(player)) return;
+            
+            const healInput = document.getElementById(`${player}-heal`);
+            const heal = parseInt(healInput ? healInput.value : document.getElementById('heal-input').value) || 0;
+            if (heal <= 0) return;
+            
+            socket.emit('heal_pokemon', {
+                room_id: roomId,
+                player: player,
+                position: position,
+                heal: heal
+            });
+            
+            if (healInput) healInput.value = '';
+        }
+
+        function updateDamageCounters(player, position, counters) {
+            if (!canControl(player)) return;
+            
+            socket.emit('update_damage_counters', {
+                room_id: roomId,
+                player: player,
+                position: position,
+                counters: parseInt(counters) || 0
+            });
+        }
+
+        function swapWithActive(player, benchIndex) {
+            if (!canControl(player)) return;
+            
+            socket.emit('swap_pokemon', {
+                room_id: roomId,
+                player: player,
+                bench_index: benchIndex
+            });
+        }
+
+        function updateStatusFromSelect(player, position, status) {
+            if (!canControl(player)) return;
+            
+            // Remover status existentes
+            const currentPokemon = position === 'active' ? gameState[player].active : gameState[player].bench[parseInt(position)];
+            for (const existingStatus of currentPokemon.status_effects) {
+                socket.emit('remove_status', {
+                    room_id: roomId,
+                    player: player,
+                    position: position,
+                    status: existingStatus
+                });
+            }
+            
+            // Adicionar novo status
+            if (status) {
+                socket.emit('add_status', {
+                    room_id: roomId,
+                    player: player,
+                    position: position,
+                    status: status
+                });
+            }
+        }
+
+        function updatePrizeCards(player, value) {
+            if (!canControl(player)) return;
+            
+            socket.emit('update_prize_cards', {
+                room_id: roomId,
+                player: player,
+                prize_cards: parseInt(value)
+            });
+        }
+
+        function resetGame() {
+            if (confirm('Resetar o jogo?')) {
+                socket.emit('reset_game', {
+                    room_id: roomId
+                });
+            }
+        }
+
+        // Funções auxiliares
+        function updatePokemonCard(elementId, pokemon) {
+            const element = document.getElementById(elementId);
+            if (pokemon.name) {
+                element.innerHTML = `
+                    <div class="pokemon-info">
+                        <div class="pokemon-name">${pokemon.name}</div>
+                        <div class="pokemon-hp">${pokemon.current_hp}/${pokemon.max_hp}</div>
+                        ${pokemon.damage_counters > 0 ? `<div class="damage-counters">💥${pokemon.damage_counters}</div>` : ''}
+                        ${pokemon.status_effects.length > 0 ? `<div class="pokemon-status">${pokemon.status_effects.join(', ')}</div>` : ''}
+                    </div>
+                `;
+                element.classList.add('has-pokemon');
+            } else {
+                element.innerHTML = '<div class="empty-slot">+</div>';
+                element.classList.remove('has-pokemon');
+            }
+        }
+
+        function updateSwapButtons() {
+            ['player1', 'player2'].forEach(player => {
+                for (let i = 0; i < 5; i++) {
+                    const benchPokemon = gameState[player].bench[i];
+                    const swapBtn = document.querySelector(`[data-player="${player}"][data-position="${i}"] .swap-btn`);
+                    
+                    if (benchPokemon.name && canControl(player)) {
+                        swapBtn.style.display = 'block';
+                    } else {
+                        swapBtn.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Funções de modal (simplificadas)
+        function showKnockoutModal(knockouts) {
+            if (knockouts.length === 0) return;
+            
+            let message = '';
+            knockouts.forEach(knockout => {
+                const ownerName = knockout.owner === 'player1' ? gameState.player1.name || 'Jogador 1' : gameState.player2.name || 'Jogador 2';
+                const defeaterName = knockout.defeated_by === 'player1' ? gameState.player1.name || 'Jogador 1' : gameState.player2.name || 'Jogador 2';
+                
+                message += `
+                    <div class="knockout-info">
+                        <div class="knockout-pokemon">${knockout.pokemon_name}</div>
+                        <div class="knockout-details">${ownerName} → ${defeaterName}</div>
+                        <div class="prize-info">🏆 +1 Carta Prêmio</div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('knockout-message').innerHTML = message;
+            document.getElementById('knockout-modal').style.display = 'flex';
+        }
+
+        function closeKnockoutModal() {
+            document.getElementById('knockout-modal').style.display = 'none';
+        }
+
+        function showVictoryModal(winner) {
+            const winnerName = winner === 'player1' ? gameState.player1.name || 'Jogador 1' : gameState.player2.name || 'Jogador 2';
+            
+            document.getElementById('victory-message').innerHTML = `
+                <div class="winner-announcement">
+                    <h4>${winnerName} VENCEU!</h4>
+                    <p>Todas as cartas prêmio coletadas!</p>
+                </div>
+            `;
+            
+            document.getElementById('victory-modal').style.display = 'flex';
+            
+            socket.emit('get_victory_sound');
+            createConfetti();
+        }
+
+        function closeVictoryModal() {
+            document.getElementById('victory-modal').style.display = 'none';
+            
+            const audio = document.getElementById('victory-audio');
+            audio.pause();
+            audio.currentTime = 0;
+        }
+
+        function playVictoryAudio(soundUrl) {
+            const audio = document.getElementById('victory-audio');
+            audio.src = soundUrl;
+            audio.volume = 0.7;
+            audio.play().catch(() => {});
+        }
+
+        function createConfetti() {
+            // Versão simplificada para mobile
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24'];
+            const confettiContainer = document.createElement('div');
+            confettiContainer.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                pointer-events: none; z-index: 9999;
+            `;
+            document.body.appendChild(confettiContainer);
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: absolute; width: 8px; height: 8px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        left: ${Math.random() * 100}%; top: -10px;
+                        animation: confetti-fall 2s linear forwards;
+                        border-radius: 50%;
+                    `;
+                    confettiContainer.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 2000);
+                }, i * 50);
+            }
+            
+            setTimeout(() => confettiContainer.remove(), 3000);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+                padding: 12px 20px; border-radius: 25px; color: white; font-weight: bold;
+                z-index: 2000; font-size: 14px; text-align: center;
+                background: ${type === 'error' ? '#e74c3c' : '#28a745'};
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Modal de edição
+        function openPokemonModal(player, position) {
+            if (!canControl(player)) {
+                showNotification('Você só pode editar seus Pokémon!', 'error');
+                return;
+            }
+            
+            currentPlayer = player;
+            currentPosition = position;
+            
+            let pokemon;
+            if (position === 'active') {
+                pokemon = gameState[player].active;
+            } else {
+                pokemon = gameState[player].bench[parseInt(position)];
+            }
+            
+            document.getElementById('pokemon-max-hp').value = pokemon.max_hp || '';
+            document.getElementById('pokemon-current-hp').value = pokemon.current_hp || '';
+            document.getElementById('pokemon-damage-counters').value = pokemon.damage_counters || 0;
+            
+            document.getElementById('pokemon-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('pokemon-modal').style.display = 'none';
+        }
+
+        function savePokemon() {
+            const maxHp = parseInt(document.getElementById('pokemon-max-hp').value) || 0;
+            const currentHp = parseInt(document.getElementById('pokemon-current-hp').value) || 0;
+            const damageCounters = parseInt(document.getElementById('pokemon-damage-counters').value) || 0;
+            
+            let pokemonName = '';
+            if (currentPosition === 'active') {
+                pokemonName = 'Pokémon Ativo';
+            } else {
+                pokemonName = `Pokémon ${parseInt(currentPosition) + 1}`;
+            }
+            
+            const pokemonData = {
+                name: pokemonName,
+                max_hp: maxHp,
+                current_hp: currentHp,
+                status_effects: [],
+                damage_counters: damageCounters
+            };
+            
+            updatePokemon(currentPlayer, currentPosition, pokemonData);
+            closeModal();
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeConnection();
+            
+            // Event listeners para toque em Pokémon
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.pokemon-card')) {
+                    e.stopPropagation();
+                    const slot = e.target.closest('[data-player]');
+                    const player = slot.dataset.player;
+                    const position = slot.dataset.position;
+                    
+                    // Se for um toque longo, abrir modal de edição
+                    if (e.detail === 1) {
+                        setTimeout(() => {
+                            if (e.detail === 1) {
+                                showControls(player, position);
+                            }
+                        }, 200);
+                    }
+                }
+            });
+
+            // Toque duplo para editar
+            document.addEventListener('dblclick', (e) => {
+                if (e.target.closest('.pokemon-card')) {
+                    e.stopPropagation();
+                    const slot = e.target.closest('[data-player]');
+                    const player = slot.dataset.player;
+                    const position = slot.dataset.position;
+                    openPokemonModal(player, position);
+                }
+            });
+            
+            // Fechar modais ao tocar fora
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+            
+            // Adicionar estilos de animação
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes confetti-fall {
+                    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1217 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.reset-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+}
+
+.reset-btn:hover {
+    background: #c0392b;
+}
+
+.game-board {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.player-section {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.player1 {
+    border-left: 5px solid #3498db;
+}
+
+.player2 {
+    border-left: 5px solid #e74c3c;
+}
+
+.player-section h2 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.prize-cards {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #ecf0f1;
+    border-radius: 8px;
+}
+
+.prize-cards label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.prize-cards input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Seção do Pokémon Ativo - CENTRALIZADA */
+.active-pokemon-section {
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.active-pokemon-section h3 {
+    margin-bottom: 20px;
+    color: #34495e;
+    font-size: 1.4em;
+}
+
+.active-pokemon-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* Controles do Pokémon Ativo */
+.active-controls {
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+    border: 2px solid #dee2e6;
+    border-radius: 15px;
+    padding: 20px;
+    min-width: 280px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Select de Status */
+.status-select-group {
+    margin-bottom: 15px;
+}
+
+.status-select-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 0.9em;
+}
+
+.status-select-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9em;
+    background: white;
+}
+
+/* Botão Mover para Banco */
+.move-to-bench-btn {
+    width: 100%;
+    padding: 10px;
+    background: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+}
+
+.move-to-bench-btn:hover {
+    background: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+}
+
+/* Controles de Dano/Cura */
+.damage-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.damage-input, .heal-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.damage-btn, .heal-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: bold;
+    transition: all 0.3s;
+    min-width: 80px;
+}
+
+.damage-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.damage-btn:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
+.heal-btn {
+    background: #27ae60;
+    color: white;
+}
+
+.heal-btn:hover {
+    background: #229954;
+    transform: scale(1.05);
+}
+
+.bench h3 {
+    margin-bottom: 15px;
+    color: #34495e;
+    text-align: center;
+}
+
+.bench-slots {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.pokemon-slot {
+    width: 140px;
+    height: 180px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.pokemon-slot:hover {
+    transform: translateY(-5px);
+}
+
+.pokemon-slot.active {
+    width: 180px;
+    height: 220px;
+}
+
+.pokemon-card {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.pokemon-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: #007bff;
+}
+
+.pokemon-card.has-pokemon {
+    background: linear-gradient(145deg, #fff, #f8f9fa);
+    border-color: #28a745;
+}
+
+.pokemon-card.knocked-out {
+    background: linear-gradient(145deg, #f8d7da, #f5c6cb);
+    border-color: #dc3545;
+    opacity: 0.7;
+}
+
+.pokemon-info {
+    text-align: center;
+    padding: 10px;
+}
+
+.pokemon-name {
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.pokemon-hp {
+    font-size: 0.9em;
+    color: #27ae60;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.damage-counters {
+    font-size: 0.8em;
+    color: #e74c3c;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.pokemon-status {
+    font-size: 0.75em;
+    color: #8e44ad;
+    font-weight: 500;
+}
+
+.empty-slot {
+    color: #6c757d;
+    font-size: 0.9em;
+    text-align: center;
+    padding: 10px;
+}
+
+.divider {
+    height: 3px;
+    background: linear-gradient(90deg, #3498db, #e74c3c);
+    border-radius: 2px;
+    margin: 10px 0;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Modal de seleção do banco */
+.bench-selection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.bench-slot-option {
+    padding: 15px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.bench-slot-option:not(.occupied):hover {
+    border-color: #28a745;
+    background: #f8fff9;
+    transform: translateY(-2px);
+}
+
+.bench-slot-option.occupied {
+    background: #f8d7da;
+    border-color: #dc3545;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.slot-empty {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.slot-occupied {
+    color: #dc3545;
+    font-size: 0.9em;
+}
+
+.save-btn, .cancel-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s;
+    margin-right: 10px;
+}
+
+.save-btn {
+    background: #3498db;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #2980b9;
+}
+
+.cancel-btn {
+    background: #95a5a6;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #7f8c8d;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .active-pokemon-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .active-controls {
+        min-width: 250px;
+    }
+    
+    .bench-slots {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .pokemon-slot {
+        width: 100px;
+        height: 140px;
+    }
+    
+    .pokemon-slot.active {
+        width: 140px;
+        height: 180px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 15% auto;
+        padding: 20px;
+    }
+    
+    .bench-selection {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .active-pokemon-container {
+        gap: 15px;
+    }
+    
+    .active-controls {
+        min-width: 200px;
+        padding: 15px;
+    }
+    
+    .pokemon-slot.active {
+        width: 120px;
+        height: 160px;
+    }
+}
+
+/* ... (manter todo o CSS anterior) ... */
+
+/* Estilos para slots do banco com botões de promoção */
+.bench-slot {
+    position: relative;
+}
+
+.promote-btn {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    z-index: 10;
+}
+
+.promote-btn:hover {
+    background: #218838;
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+.promote-btn:active {
+    transform: translateX(-50%) translateY(0px);
+}
+
+/* Ajustar espaçamento dos slots do banco */
+.bench-slot .pokemon-card {
+    margin-bottom: 10px;
+}
+
+/* Modal de confirmação de promoção */
+#promote-modal .modal-content {
+    max-width: 450px;
+}
+
+#promote-message {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid #ffc107;
+}
+
+#promote-message p {
+    margin-bottom: 10px;
+}
+
+#promote-message p:last-child {
+    margin-bottom: 0;
+}
+
+/* Notificações */
+.notification {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Responsivo para botões de promoção */
+@media (max-width: 768px) {
+    .promote-btn {
+        font-size: 0.6em;
+        padding: 3px 6px;
+        bottom: -3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .promote-btn {
+        position: static;
+        transform: none;
+        margin-top: 5px;
+        width: 100%;
+        font-size: 0.7em;
+    }
+    
+    .bench-slot .pokemon-card {
+        margin-bottom: 5px;
+    }
+}
+
+/* ... (manter todo o CSS anterior) ... */
+
+/* Controles de Contadores de Dano */
+.damage-counter-controls {
+    margin-bottom: 15px;
+}
+
+.damage-counter-controls label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 0.9em;
+}
+
+.counter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.counter-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9em;
+    text-align: center;
+    background: #fff;
+}
+
+.counter-label {
+    font-size: 1.2em;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Contadores de dano nas cartas */
+.damage-counters {
+    font-size: 0.8em;
+    color: #e74c3c;
+    font-weight: bold;
+    margin-bottom: 3px;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Ajustar espaçamento dos controles */
+.active-controls > * {
+    margin-bottom: 15px;
+}
+
+.active-controls > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsivo para controles de contadores */
+@media (max-width: 768px) {
+    .counter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .counter-input {
+        text-align: center;
+    }
+    
+    .counter-label {
+        text-align: center;
+        font-size: 1.1em;
+    }
+}
+
+/* ... (manter todo o CSS anterior) ... */
+
+/* Modal de Knockout */
+.knockout-modal-content {
+    background: linear-gradient(145deg, #2c3e50, #34495e);
+    color: white;
+    text-align: center;
+    border: 3px solid #e74c3c;
+    max-width: 500px;
+}
+
+.knockout-modal-content h2 {
+    color: #e74c3c;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.knockout-info {
+    background: rgba(255, 255, 255, 0.1);
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #e74c3c;
+}
+
+.knockout-pokemon {
+    font-size: 1.2em;
+    margin-bottom: 8px;
+    color: #ecf0f1;
+}
+
+.knockout-details {
+    font-size: 1em;
+    margin-bottom: 8px;
+    color: #bdc3c7;
+}
+
+.prize-info {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #f39c12;
+    background: rgba(243, 156, 18, 0.2);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Notificação de vitória */
+.notification.victory {
+    font-size: 1.2em;
+    border: 2px solid #f39c12;
+    animation: victoryPulse 0.5s infinite alternate;
+}
+
+@keyframes victoryPulse {
+    from { box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3); }
+    to { box-shadow: 0 8px 24px rgba(255, 193, 7, 0.6); }
+}
+
+/* Responsivo para modal de knockout */
+@media (max-width: 768px) {
+    .knockout-modal-content {
+        margin: 20% auto;
+        padding: 20px;
+    }
+    
+    .knockout-modal-content h2 {
+        font-size: 2em;
+    }
+    
+    .knockout-info {
+        padding: 10px;
+    }
+}
+
+/* ... (manter todo o CSS anterior) ... */
+
+/* Modal de Vitória */
+.victory-modal-content {
+    background: linear-gradient(145deg, #f39c12, #e67e22);
+    color: white;
+    text-align: center;
+    border: 3px solid #f1c40f;
+    max-width: 600px;
+    animation: victoryBounce 0.6s ease-out;
+}
+
+@keyframes victoryBounce {
+    0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+    50% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.victory-modal-content h2 {
+    color: #fff;
+    font-size: 3em;
+    margin-bottom: 20px;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+    animation: victoryPulse 2s infinite;
+}
+
+@keyframes victoryPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.winner-announcement {
+    background: rgba(255, 255, 255, 0.2);
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.winner-announcement h3 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.winner-announcement p {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.victory-stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.victory-stats div {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.victory-celebration {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+    font-size: 3em;
+    animation: celebration 1s infinite alternate;
+}
+
+@keyframes celebration {
+    from { transform: translateY(0px); }
+    to { transform: translateY(-10px); }
+}
+
+.fireworks {
+    animation: fireworksSpin 2s linear infinite;
+}
+
+@keyframes fireworksSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.trophy {
+    animation: trophyBounce 1.5s ease-in-out infinite;
+}
+
+@keyframes trophyBounce {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-5deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
+}
+
+/* Botões do modal de vitória */
+.victory-modal-content .modal-buttons {
+    margin-top: 30px;
+}
+
+.victory-modal-content .save-btn {
+    background: linear-gradient(145deg, #27ae60, #2ecc71);
+    border: 2px solid #fff;
+    font-size: 1.1em;
+    padding: 12px 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+.victory-modal-content .save-btn:hover {
+    background: linear-gradient(145deg, #2ecc71, #27ae60);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.victory-modal-content .cancel-btn {
+    background: linear-gradient(145deg, #95a5a6, #7f8c8d);
+    border: 2px solid #fff;
+    font-size: 1.1em;
+    padding: 12px 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+.victory-modal-content .cancel-btn:hover {
+    background: linear-gradient(145deg, #7f8c8d, #95a5a6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+/* Efeitos especiais para confetes */
+.confetti-container {
+    overflow: hidden;
+}
+
+/* Responsivo para modal de vitória */
+@media (max-width: 768px) {
+    .victory-modal-content {
+        margin: 10% auto;
+        padding: 20px;
+        max-width: 95%;
+    }
+    
+    .victory-modal-content h2 {
+        font-size: 2.5em;
+    }
+    
+    .winner-announcement h3 {
+        font-size: 1.5em;
+    }
+    
+    .winner-announcement p {
+        font-size: 1em;
+    }
+    
+    .victory-celebration {
+        font-size: 2em;
+        gap: 15px;
+    }
+    
+    .victory-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .victory-stats div {
+        width: 80%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .victory-modal-content h2 {
+        font-size: 2em;
+    }
+    
+    .victory-celebration {
+        font-size: 1.5em;
+        gap: 10px;
+    }
+    
+    .victory-modal-content .save-btn,
+    .victory-modal-content .cancel-btn {
+        font-size: 1em;
+        padding: 10px 15px;
+    }
+}
+
+/* ... (manter todo o CSS anterior) ... */
+
+/* Tela de Conexão */
+.connection-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.connection-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+}
+
+.connection-content h1 {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+.connection-options {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.option-group {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #3498db;
+}
+
+.option-group h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.create-btn, .join-btn {
+    background: linear-gradient(145deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.create-btn:hover, .join-btn:hover {
+    background: linear-gradient(145deg, #2980b9, #3498db);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+}
+
+#room-code {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1.1em;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+#room-code:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.connection-status {
+    padding: 15px;
+    background: #ecf0f1;
+    border-radius: 8px;
+    border-left: 4px solid #95a5a6;
+}
+
+.status-indicator {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+/* Header do jogo */
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.room-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+
+.copy-btn {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.3s;
+}
+
+.copy-btn:hover {
+    background: #138496;
+}
+
+.player-info {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.connection-indicator {
+    font-size: 0.8em;
+    margin-left: 5px;
+}
+
+/* Controles desabilitados */
+.disabled-control {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Responsivo para tela de conexão */
+@media (max-width: 768px) {
+    .connection-content {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+    
+    .connection-content h1 {
+        font-size: 2em;
+    }
+    
+    .connection-options {
+        gap: 20px;
+    }
+    
+    .option-group {
+        padding: 15px;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .room-info, .player-info {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .connection-content h1 {
+        font-size: 1.8em;
+    }
+    
+    .create-btn, .join-btn {
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+}
+/* ... (manter todo o CSS anterior) ... */
+
+/* Campos de nome na tela de conexão */
+#player-name-create,
+#player-name-join {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1.1em;
+    text-align: center;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+#player-name-create:focus,
+#player-name-join:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+/* Campo de código da sala sem transformação automática */
+#room-code {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1.1em;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    background: #fff;
+    /* Removido text-transform: uppercase; */
+}
+
+#room-code:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+/* Estilos para nomes dos jogadores */
+#player1-name,
+#player2-name {
+    font-weight: bold;
+    color: inherit;
+}
+
+/* Responsivo para campos de entrada */
+@media (max-width: 768px) {
+    #player-name-create,
+    #player-name-join,
+    #room-code {
+        font-size: 1em;
+        padding: 8px;
+    }
+}
+/* Básico */
+html, body {
+    touch-action: manipulation; /* Bloqueia gestos de zoom por pinça */
+    user-select: none; /* Impede a seleção de texto, reduzindo zoom acidental */
+    overflow-x: hidden; /* Remove possibilidade de rolagem lateral */
+    height: 100%;
+}
+
+input, textarea, select, button {
+    touch-action: none; /* Bloqueia zoom em campos interativos */
+    font-size: 16px; /* Evita zoom automático em dispositivos iOS */
+}
