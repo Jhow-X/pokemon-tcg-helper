@@ -47,10 +47,33 @@ header h1 {
     background: #c0392b;
 }
 
+.home-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+}
+
+.home-btn:hover {
+    background: #2980b9;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 .game-board {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    perspective: 1200px;
 }
 
 .player-section {
@@ -1203,6 +1226,94 @@ header h1 {
         padding: 8px;
     }
 }
+
+/* Botão de Evolução */
+.evolution-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(145deg, #9b59b6, #8e44ad);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: bold;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.evolution-btn:hover {
+    background: linear-gradient(145deg, #8e44ad, #7d3c98);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
+}
+
+.evolution-btn:active {
+    transform: translateY(0);
+}
+
+/* Botão de Evolução dentro da caixa de Pokémon */
+.pokemon-evolve-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(145deg, #9b59b6, #8e44ad);
+    color: white;
+    border: 2px solid white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    box-shadow: 0 3px 6px rgba(155, 89, 182, 0.4);
+    z-index: 20;
+    pointer-events: auto;
+    padding: 0;
+}
+
+.pokemon-evolve-btn:hover {
+    background: linear-gradient(145deg, #8e44ad, #7d3c98);
+    transform: scale(1.15);
+    box-shadow: 0 5px 10px rgba(155, 89, 182, 0.6);
+}
+
+.pokemon-evolve-btn:active {
+    transform: scale(0.95);
+}
+
+/* Container relativo para os botões ficarem posicionados corretamente */
+.pokemon-info {
+    position: relative;
+    width: 100%;
+}
+
+/* Botão de incremento rápido (+10) */
+.quick-increment-btn {
+    padding: 8px 12px;
+    background: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s;
+    min-width: 50px;
+}
+
+.quick-increment-btn:hover {
+    background: #e67e22;
+    transform: scale(1.05);
+}
+
+.quick-increment-btn:active {
+    transform: scale(0.95);
+}
+
 /* Básico */
 html, body {
     touch-action: manipulation; /* Bloqueia gestos de zoom por pinça */

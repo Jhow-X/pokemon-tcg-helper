@@ -6,6 +6,23 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pokemon_tcg_secret_key'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Carregar variáveis de ambiente do arquivo .vars
+def load_env_vars():
+    vars_dict = {}
+    vars_file = os.path.join(os.path.dirname(__file__), '.vars')
+    if os.path.exists(vars_file):
+        with open(vars_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        vars_dict[key.strip()] = value.strip()
+    return vars_dict
+
+ENV_VARS = load_env_vars()
+MOBILE_VERSION = ENV_VARS.get('MOBILEVERSION', 'false').lower() == 'true'
+
 # -----------------------------
 #  CLASSES PRINCIPAIS
 # -----------------------------
@@ -140,13 +157,17 @@ def get_random_victory_sound():
 # -----------------------------
 #  ROTAS
 # -----------------------------
+# Escolher template baseado na configuração
+TEMPLATE_NAME = 'index-mobile.html' if MOBILE_VERSION else 'index.html'
+STYLESHEET = 'style-mobile.css' if MOBILE_VERSION else 'style.css'
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template(TEMPLATE_NAME)
 
 @app.route('/room/<room_id>')
 def join_room_page(room_id):
-    return render_template('index.html', room_id=room_id)
+    return render_template(TEMPLATE_NAME, room_id=room_id)
 
 
 # -----------------------------
@@ -202,6 +223,43 @@ def on_join_game(data):
     socketio.emit('game_state_update', gs.to_dict(), room=room_id)
 
 
+@socketio.on('rejoin_game')
+def on_rejoin_game(data):
+    room_id = normalize_room(data.get("room_id"))
+    player_name = data.get("player_name", "Jogador")
+
+    # Verificar se a sala existe
+    if room_id not in game_rooms:
+        emit('error', {'message': 'Sala não encontrada'})
+        return
+
+    gs = game_rooms[room_id]
+    join_room(room_id)
+
+    # Encontrar o jogador baseado no nome
+    assigned = None
+    for p in ["player1", "player2"]:
+        if gs.get_player(p)['name'] == player_name:
+            gs.get_player(p).update({
+                'connected': True,
+                'socket_id': request.sid
+            })
+            assigned = p
+            break
+
+    if not assigned:
+        emit('error', {'message': 'Jogador não encontrado nesta sala'})
+        return
+
+    emit('player_assigned', {
+        'player': assigned,
+        'room_id': room_id,
+        'game_state': gs.to_dict()
+    })
+
+    socketio.emit('game_state_update', gs.to_dict(), room=room_id)
+
+
 # -----------------------------
 #  HANDLER UTILITÁRIO
 # -----------------------------
@@ -239,7 +297,16 @@ def on_apply_damage(data):
     if not gs: return
 
     target = gs.get_target(data['player'], data['position'])
-    target.current_hp = max(0, target.current_hp - int(data['damage']))
+    damage = int(data['damage'])
+    target.current_hp = max(0, target.current_hp - damage)
+    
+    # Calcular contadores automáticos: 1 contador a cada 10 dano total sofrido
+    total_damage_taken = target.max_hp - target.current_hp
+    auto_counters = max(0, total_damage_taken // 10)
+    
+    # Se o contador manual é maior que o calculado, manter o manual
+    # Caso contrário, usar o calculado
+    target.damage_counters = max(target.damage_counters, auto_counters)
 
     ko = gs.check_and_remove_knocked_out(data.get('attacking_player'))
     update_and_emit(gs, room_id, ko)

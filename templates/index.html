@@ -47,7 +47,10 @@
                         <span id="player-role"></span>
                     </div>
                 </div>
-                <button onclick="resetGame()" class="reset-btn">🔄 Resetar Jogo</button>
+                <div class="header-buttons">
+                    <button onclick="resetGame()" class="reset-btn">🔄 Resetar Jogo</button>
+                    <button onclick="returnToHome()" class="home-btn">🏠 Voltar</button>
+                </div>
             </header>
 
             <div class="game-board">
@@ -63,38 +66,7 @@
                     <!-- Banco do Jogador 2 -->
                     <div class="bench">
                         <h3>Banco</h3>
-                        <div class="bench-slots">
-                            <div class="pokemon-slot bench-slot" data-player="player2" data-position="0">
-                                <div class="pokemon-card" id="player2-bench-0"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player2', 0)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player2" data-position="1">
-                                <div class="pokemon-card" id="player2-bench-1"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player2', 1)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player2" data-position="2">
-                                <div class="pokemon-card" id="player2-bench-2"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player2', 2)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player2" data-position="3">
-                                <div class="pokemon-card" id="player2-bench-3"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player2', 3)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player2" data-position="4">
-                                <div class="pokemon-card" id="player2-bench-4"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player2', 4)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                        </div>
+                        <div class="bench-slots" id="player2-bench-slots"></div>
                     </div>
                     
                     <!-- Pokémon Ativo do Jogador 2 Centralizado -->
@@ -209,38 +181,7 @@
                     <!-- Banco do Jogador 1 -->
                     <div class="bench">
                         <h3>Banco</h3>
-                        <div class="bench-slots">
-                            <div class="pokemon-slot bench-slot" data-player="player1" data-position="0">
-                                <div class="pokemon-card" id="player1-bench-0"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player1', 0)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player1" data-position="1">
-                                <div class="pokemon-card" id="player1-bench-1"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player1', 1)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player1" data-position="2">
-                                <div class="pokemon-card" id="player1-bench-2"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player1', 2)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player1" data-position="3">
-                                <div class="pokemon-card" id="player1-bench-3"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player1', 3)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                            <div class="pokemon-slot bench-slot" data-player="player1" data-position="4">
-                                <div class="pokemon-card" id="player1-bench-4"></div>
-                                <button class="promote-btn" onclick="swapWithActive('player1', 4)" style="display: none;">
-                                    ⬆️ Trocar
-                                </button>
-                            </div>
-                        </div>
+                        <div class="bench-slots" id="player1-bench-slots"></div>
                     </div>
                 </div>
             </div>
@@ -255,7 +196,10 @@
             
             <div class="form-group">
                 <label>HP Máximo:</label>
-                <input type="number" id="pokemon-max-hp" min="0" placeholder="HP Máximo">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="number" id="pokemon-max-hp" min="0" placeholder="HP Máximo" style="flex: 1;">
+                    <button onclick="incrementMaxHp()" class="quick-increment-btn" title="Aumenta 10 HP">+10</button>
+                </div>
             </div>
             
             <div class="form-group">
@@ -271,6 +215,32 @@
             <div class="modal-buttons">
                 <button onclick="savePokemon()" class="save-btn">💾 Salvar</button>
                 <button onclick="closeModal()" class="cancel-btn">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Evolução -->
+    <div id="evolution-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEvolutionModal()">&times;</span>
+            <h2>⚡ Evoluir Pokémon</h2>
+            <div style="margin: 20px 0; text-align: center;">
+                <p style="font-size: 1.2em; color: #2c3e50; margin-bottom: 10px;">
+                    <strong id="evolution-pokemon-name">Pokémon</strong> está evoluindo!
+                </p>
+                <p style="color: #7f8c8d; font-size: 0.9em;">
+                    Digite o novo HP máximo. O dano atual será preservado.
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label>Novo HP Máximo:</label>
+                <input type="number" id="evolution-new-hp" min="1" placeholder="Ex: 150">
+            </div>
+            
+            <div class="modal-buttons">
+                <button onclick="saveEvolution()" class="save-btn">⚡ Evoluir</button>
+                <button onclick="closeEvolutionModal()" class="cancel-btn">❌ Cancelar</button>
             </div>
         </div>
     </div>
@@ -317,6 +287,34 @@
         let roomId = '';
         let myPlayer = '';
         let myPlayerName = '';
+        let evolutionData = null;
+
+        // Carregar dados em cache
+        function loadFromCache() {
+            const cached = localStorage.getItem('pokemon-tcg-cache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                roomId = data.roomId || '';
+                myPlayer = data.myPlayer || '';
+                myPlayerName = data.myPlayerName || '';
+                return true;
+            }
+            return false;
+        }
+
+        // Salvar dados em cache
+        function saveToCache() {
+            localStorage.setItem('pokemon-tcg-cache', JSON.stringify({
+                roomId: roomId,
+                myPlayer: myPlayer,
+                myPlayerName: myPlayerName
+            }));
+        }
+
+        // Limpar cache
+        function clearCache() {
+            localStorage.removeItem('pokemon-tcg-cache');
+        }
 
         // Inicializar conexão
         function initializeConnection() {
@@ -324,6 +322,14 @@
             
             socket.on('connect', () => {
                 updateConnectionStatus(true);
+                
+                // Tentar reconectar se há dados em cache
+                if (loadFromCache() && roomId && myPlayerName) {
+                    socket.emit('rejoin_game', {
+                        room_id: roomId,
+                        player_name: myPlayerName
+                    });
+                }
             });
             
             socket.on('disconnect', () => {
@@ -335,10 +341,14 @@
                 roomId = data.room_id;
                 gameState = data.game_state;
                 
+                // Salvar em cache
+                saveToCache();
+                
                 document.getElementById('room-display').textContent = roomId;
                 document.getElementById('player-role').textContent = `Você é: ${myPlayerName}`;
                 
                 showGameScreen();
+                adjustBoardLayout();
                 updateUI();
             });
             
@@ -403,9 +413,33 @@
             }
         }
 
+        function generateBenchSlots(player) {
+            const container = document.getElementById(`${player}-bench-slots`);
+            container.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'pokemon-slot bench-slot';
+                slot.dataset.player = player;
+                slot.dataset.position = i;
+                slot.innerHTML = `
+                    <div class="pokemon-card" id="${player}-bench-${i}"></div>
+                    <button class="promote-btn" onclick="swapWithActive('${player}', ${i})" style="display: none;">
+                        ⬆️ Trocar
+                    </button>
+                `;
+                container.appendChild(slot);
+            }
+        }
+
+        function getPlayerName(playerKey) {
+            return gameState[playerKey].name || (playerKey === 'player1' ? 'Jogador 1' : 'Jogador 2');
+        }
+
         function showGameScreen() {
             document.getElementById('connection-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
+            generateBenchSlots('player1');
+            generateBenchSlots('player2');
         }
 
         function copyRoomCode() {
@@ -418,33 +452,11 @@
         function updateUI() {
             if (!gameState) return;
             
-            // Atualizar nomes dos jogadores
-            if (gameState.player1.name) {
-                document.getElementById('player1-name').textContent = gameState.player1.name;
-            }
-            if (gameState.player2.name) {
-                document.getElementById('player2-name').textContent = gameState.player2.name;
-            }
-            
-            // Atualizar indicadores de conexão
-            document.getElementById('player1-status').textContent = gameState.player1.connected ? '🟢' : '🔴';
-            document.getElementById('player2-status').textContent = gameState.player2.connected ? '🟢' : '🔴';
-            
-            // Atualizar cartas prêmio
-            document.getElementById('player1-prizes').value = gameState.player1.prize_cards;
-            document.getElementById('player2-prizes').value = gameState.player2.prize_cards;
-            
-            // Atualizar Pokémon ativo
-            updatePokemonCard('player1-active', gameState.player1.active);
-            updatePokemonCard('player2-active', gameState.player2.active);
-            
-            // Atualizar selects de status
-            updateStatusSelect('player1', gameState.player1.active.status_effects);
-            updateStatusSelect('player2', gameState.player2.active.status_effects);
-            
-            // Atualizar contadores de dano do ativo
-            document.getElementById('player1-damage-counters').value = gameState.player1.active.damage_counters || 0;
-            document.getElementById('player2-damage-counters').value = gameState.player2.active.damage_counters || 0;
+            // Atualizar ambos jogadores
+            ['player1', 'player2'].forEach(player => {
+                const playerData = gameState[player];
+                updatePlayerUI(player, playerData);
+            });
             
             // Atualizar banco
             for (let i = 0; i < 5; i++) {
@@ -458,6 +470,43 @@
             // Verificar se o jogo terminou
             if (gameState.game_ended && gameState.winner) {
                 showVictoryModal(gameState.winner);
+            }
+        }
+
+        function updatePlayerUI(player, playerData) {
+            if (playerData.name) {
+                document.getElementById(`${player}-name`).textContent = playerData.name;
+            }
+            
+            document.getElementById(`${player}-status`).textContent = playerData.connected ? '🟢' : '🔴';
+            document.getElementById(`${player}-prizes`).value = playerData.prize_cards;
+            
+            updatePokemonCard(`${player}-active`, playerData.active);
+            updateStatusSelect(player, playerData.active.status_effects);
+            document.getElementById(`${player}-damage-counters`).value = playerData.active.damage_counters || 0;
+        }
+
+        // Ajustar layout do tabuleiro para colocar cartas do jogador sempre em baixo
+        function adjustBoardLayout() {
+            const gameBoard = document.querySelector('.game-board');
+            const player1Section = document.querySelector('.player1');
+            const player2Section = document.querySelector('.player2');
+            const divider = document.querySelector('.divider');
+            
+            if (!gameBoard || !player1Section || !player2Section || !divider) return;
+            
+            // Se você é o jogador 2, reordenar com CSS flex-order
+            if (myPlayer === 'player2') {
+                // Player 1 (oponente) fica em cima
+                player1Section.style.order = '1';
+                divider.style.order = '2';
+                // Player 2 (você) fica em baixo
+                player2Section.style.order = '3';
+            } else {
+                // Ordem padrão
+                player2Section.style.order = '1';
+                divider.style.order = '2';
+                player1Section.style.order = '3';
             }
         }
 
@@ -575,12 +624,78 @@
             }
         }
 
+        function returnToHome() {
+            if (confirm('Tem certeza que deseja voltar à tela inicial? Você sairá da sala.')) {
+                clearCache();
+                socket.disconnect();
+                location.reload();
+            }
+        }
+
+        function openEvolutionModal(player, position) {
+            if (!canControl(player)) return;
+            
+            const pokemon = position === 'active' ? gameState[player].active : gameState[player].bench[parseInt(position)];
+            
+            evolutionData = {
+                player: player,
+                position: position,
+                previousDamage: pokemon.max_hp - pokemon.current_hp
+            };
+            
+            document.getElementById('evolution-pokemon-name').textContent = pokemon.name || 'Pokémon';
+            document.getElementById('evolution-new-hp').value = '';
+            document.getElementById('evolution-modal').style.display = 'block';
+        }
+
+        function closeEvolutionModal() {
+            document.getElementById('evolution-modal').style.display = 'none';
+            evolutionData = null;
+        }
+
+        function saveEvolution() {
+            if (!evolutionData) return;
+            
+            const newMaxHp = parseInt(document.getElementById('evolution-new-hp').value) || 0;
+            if (newMaxHp <= 0) {
+                showNotification('Por favor, digite um HP válido!', 'error');
+                return;
+            }
+            
+            const newCurrentHp = Math.max(0, newMaxHp - evolutionData.previousDamage);
+            
+            const pokemon = evolutionData.position === 'active' ? 
+                gameState[evolutionData.player].active : 
+                gameState[evolutionData.player].bench[parseInt(evolutionData.position)];
+            
+            const pokemonData = {
+                name: pokemon.name,
+                max_hp: newMaxHp,
+                current_hp: newCurrentHp,
+                status_effects: pokemon.status_effects,
+                damage_counters: Math.floor(evolutionData.previousDamage / 10)
+            };
+            
+            updatePokemon(evolutionData.player, evolutionData.position, pokemonData);
+            closeEvolutionModal();
+            showNotification('Pokémon evoluiu com sucesso!', 'success');
+        }
+
         // Funções auxiliares
         function updatePokemonCard(elementId, pokemon) {
             const element = document.getElementById(elementId);
+            const slot = element.closest('.pokemon-slot');
+            const player = slot ? slot.dataset.player : null;
+            const position = slot ? slot.dataset.position : null;
+            
             if (pokemon.name) {
+                const canEvolve = player && canControl(player);
+                const evolveButton = canEvolve ? 
+                    `<button onclick="event.stopPropagation(); openEvolutionModal('${player}', '${position}')" class="pokemon-evolve-btn" title="Evoluir Pokémon">⚡</button>` : '';
+                
                 element.innerHTML = `
                     <div class="pokemon-info">
+                        ${evolveButton}
                         <div class="pokemon-name">${pokemon.name}</div>
                         <div class="pokemon-hp">${pokemon.current_hp}/${pokemon.max_hp} HP</div>
                         ${pokemon.damage_counters > 0 ? `<div class="damage-counters">💥 ${pokemon.damage_counters}</div>` : ''}
@@ -625,8 +740,8 @@
             
             let message = '';
             knockouts.forEach(knockout => {
-                const ownerName = knockout.owner === 'player1' ? gameState.player1.name || 'Jogador 1' : gameState.player2.name || 'Jogador 2';
-                const defeaterName = knockout.defeated_by === 'player1' ? gameState.player1.name || 'Jogador 1' : gameState.player2.name || 'Jogador 2';
+                const ownerName = getPlayerName(knockout.owner);
+                const defeaterName = getPlayerName(knockout.defeated_by);
                 const position = knockout.position === 'active' ? 'Ativo' : 'Banco';
                 
                 message += `
@@ -653,7 +768,7 @@
         }
 
         function showVictoryModal(winner) {
-            const winnerName = winner === 'player1' ? gameState.player1.name || 'Jogador 1' : gameState.player2.name || 'Jogador 2';
+            const winnerName = getPlayerName(winner);
             const winnerColor = winner === 'player1' ? '#3498db' : '#e74c3c';
             
             document.getElementById('victory-message').innerHTML = `
@@ -806,10 +921,21 @@
             document.getElementById('pokemon-modal').style.display = 'none';
         }
 
+        function incrementMaxHp() {
+            const input = document.getElementById('pokemon-max-hp');
+            const currentValue = parseInt(input.value) || 0;
+            input.value = currentValue + 10;
+        }
+
         function savePokemon() {
             const maxHp = parseInt(document.getElementById('pokemon-max-hp').value) || 0;
-            const currentHp = parseInt(document.getElementById('pokemon-current-hp').value) || 0;
+            let currentHp = parseInt(document.getElementById('pokemon-current-hp').value) || 0;
             const damageCounters = parseInt(document.getElementById('pokemon-damage-counters').value) || 0;
+            
+            // Se HP atual não foi preenchido, usar HP máximo (primeira vez)
+            if (currentHp === 0 && maxHp > 0) {
+                currentHp = maxHp;
+            }
             
             // Gerar nome genérico baseado na posição
             let pokemonName = '';
@@ -857,10 +983,12 @@
             window.addEventListener('click', (event) => {
                 const modal = document.getElementById('pokemon-modal');
                 const knockoutModal = document.getElementById('knockout-modal');
+                const evolutionModal = document.getElementById('evolution-modal');
                 const victoryModal = document.getElementById('victory-modal');
                 
                 if (event.target === modal) closeModal();
                 if (event.target === knockoutModal) closeKnockoutModal();
+                if (event.target === evolutionModal) closeEvolutionModal();
                 if (event.target === victoryModal) closeVictoryModal();
             });
             
